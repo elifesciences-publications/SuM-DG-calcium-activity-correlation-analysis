@@ -1,0 +1,9 @@
+%% absolute GCaMP signal sum up
+coG=coef(1,:);
+coTd=coef(2,:);
+
+coG=filter_2sIIR(coG,0.01,10,3,'high')+coG(1);  %highpass filter
+coTd=filter_2sIIR(coTd,0.01,10,3,'high')+coTd(1);  %highpass filter
+
+coG_coTd_ratio=(coG./coTd).*100;
+coG_coTd_pre=((coG./coTd)-mean(coG./coTd))./mean(coG./coTd).*100;
