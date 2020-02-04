@@ -1,0 +1,39 @@
+% time courses in columns
+data=DG_base_pre';
+
+num=1; % num of columns
+data_length=length(data); % data points of each time course
+%data=coef(1,:)';
+
+for i=1:num
+Ratio_data(:,i)=data(1:data_length,i); % data matrix time courses in columns
+
+samplerate=10; % in Hz
+forder=6;     % filter order
+fstep=0.005;   % frequency step for wavelet
+
+N=data_length;
+spec = tfa_morlet(Ratio_data(:,i)', samplerate, 0.005, 2, fstep);
+    taxis=[1:N]/samplerate; % the x axis for plotting the time-freq figure
+    faxis=[0.005:fstep:2]; % the y axis for plotting the time-freq figure
+    Mag(:,:,i)=abs(spec);
+
+end
+
+% % %
+% In the following steps, if the results are transformed by 10*log10, 
+% then the unit is dB/Hz, the original unit is "%/Hz" if the raw data  
+% had been transformed into percentage changes.
+% % %
+
+% plot the mean time-freq result (dB/Hz)
+pcolor(taxis,faxis,10*log10(mean(Mag,3)))
+shading flat;
+
+% power spectrums of pre and post (dB/Hz)
+figure;
+hold on
+plot(faxis,mean(10*log10(mean(Mag,3)),2))
+
+% Mean power (0.1-0.8 Hz) change with time, y/200=hz
+Band=mean(Mag(21:100,:),1);
