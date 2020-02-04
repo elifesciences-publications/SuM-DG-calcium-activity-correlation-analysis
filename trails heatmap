@@ -1,0 +1,16 @@
+%% input event timepoint
+before=30;
+after=30;
+
+%% extract DG event perievent data
+
+eventOld=round(eventOld);
+eventNovel=round(eventNovel);
+
+for i=1:length(eventOld)
+rasterOld_DG(i,:)=DG_test_pre(eventOld(i)-before:eventOld(i)+after);
+end
+
+for i=1:length(eventNovel)
+rasterNovel_DG(i,:)=DG_test_pre(eventNovel(i)-before:eventNovel(i)+after);
+end
