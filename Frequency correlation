@@ -1,0 +1,41 @@
+% time courses in columns
+data=A';
+
+num=2; % num of columns
+data_length=length(data); % data points of each time course
+
+for i=1:num
+    Ratio_data(:,i)=data(1:data_length,i); % data matrix time courses in columns
+    samplerate=10; % in Hz
+    forder=6;     % filter order
+    fstep=0.005;   % frequency step for wavelet
+
+    N=data_length;
+    spec = tfa_morlet(Ratio_data(:,i)', samplerate, 0.005, 2, fstep);
+    taxis=[1:N]/samplerate; % the x axis for plotting the time-freq figure
+    faxis=[0.005:fstep:2]; % the y axis for plotting the time-freq figure
+    Mag(:,:,i)=abs(spec);
+end
+
+%0.005 is step size, so 0.1Hz=20 data points,2Hz=400 data points, bin=20
+%0.5hz=100
+bin=20;
+for k=0:2/fstep/bin-1
+    DG_Mag=Mag(:,:,1);
+    DG_band(k+1,:)=mean(DG_Mag(bin.*k+1:bin.*(k+1),:));
+    Sum_Mag=Mag(:,:,2);
+    Sum_band(k+1,:)=mean(Sum_Mag(bin.*k+1:bin.*(k+1),:));
+end
+
+for m=1:2/fstep/bin
+    for n=1:2/fstep/bin
+    [R_DG_Sum(m,n),P_DG_Sum(m,n)]=corr(DG_band(m,:)',Sum_band(n,:)');
+    
+    end
+end
+
+figure;
+imagesc(R_DG_Sum,[-0.5 0.5])
+xlabel('Sum');
+ylabel('DG');
+colorbar
