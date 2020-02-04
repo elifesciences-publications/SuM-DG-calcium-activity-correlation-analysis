@@ -1,0 +1,36 @@
+function [] = unmixing
+clc
+
+[dataID,path_data] = uigetfile('*.txt','Select data');
+[refID,path_ref] = uigetfile('*.csv','Select reference');
+cd(path_data)
+
+ref=csvread([path_ref refID],1,1);
+
+file = fopen([path_data dataID],'r');
+data = textscan(file, '%s','HeaderLines',15);
+data=reshape([0;0;data{1,1}],1046,(length(data{1,1})+2)/1046);
+data=data(3:end,2:end);
+fclose(file);
+
+coef=zeros(size(ref,2),size(data,2));
+for i=1:size(data,2)
+coef(:,i)=max(0,lsqnonneg(ref(140:500,:),str2double(data(140:500,i))));
+clc
+[num2str(i/size(data,2)*100) '%']
+end
+
+subplot(2,1,1)
+plot(0.1:0.1:size(data,2)/10,coef(1,:)/mean(coef(1,:),2)*100-100) 
+%20hz, plot(0.5:0.5:size(data,2)/20,coef(1,:)/mean(coef(1,:),2)*100-100) 
+title('GCaMP time course','FontWeight','bold','FontSize',12)
+xlabel('Time (s)','FontWeight','bold','FontSize',12)
+ylabel('dF/F (%)','FontWeight','bold','FontSize',12)
+
+subplot(2,1,2)
+plot(0.1:0.1:size(data,2)/10,coef(2,:)/mean(coef(2,:),2)*100-100)
+title('tdTomato time course','FontWeight','bold','FontSize',12)
+xlabel('Time (s)','FontWeight','bold','FontSize',12)
+ylabel('dF/F (%)','FontWeight','bold','FontSize',12)
+
+save([dataID(1:length(dataID)-4) '.mat'],'coef')
